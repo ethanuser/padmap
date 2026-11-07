@@ -7,7 +7,7 @@
   --muted: #6b6b6b;
   --line: #4d4d4d;
   --rule: #cfcfcf;
-  --leader: #a3a3a3;
+  --leader: #8c8c8c;
   --live: #147874;
   --warn: #b26a00;
   --red: #a64c47; --orange: #9d580c; --green: #2c7f44; --blue: #2c6fae;
@@ -35,7 +35,7 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #242424; --surface: #2e2e2e; --surface-hi: #383838; --ink: #ededed; --muted: #a3a3a3;
-    --line: #8f8f8f; --rule: #474747; --leader: #686868; --live: #5fc4bb; --warn: #e3a64a;
+    --line: #8f8f8f; --rule: #474747; --leader: #7d7d7d; --live: #5fc4bb; --warn: #e3a64a;
     --red: #ea9891; --orange: #e0a26f; --green: #82c38f; --blue: #7fb6ee;
     --pad-body: #353535; --pad-stroke: #b5b5b5; --pad-btn: #e2e2e2; --pad-btn-ink: #262626; --pad-shoulder: #4a4a4a;
     --shadow: 0 8px 28px rgba(0, 0, 0, .45);
@@ -45,7 +45,7 @@
 }
 :root[data-theme="dark"] {
   --bg: #242424; --surface: #2e2e2e; --surface-hi: #383838; --ink: #ededed; --muted: #a3a3a3;
-  --line: #8f8f8f; --rule: #474747; --leader: #686868; --live: #5fc4bb; --warn: #e3a64a;
+  --line: #8f8f8f; --rule: #474747; --leader: #7d7d7d; --live: #5fc4bb; --warn: #e3a64a;
   --red: #ea9891; --orange: #e0a26f; --green: #82c38f; --blue: #7fb6ee;
   --pad-body: #353535; --pad-stroke: #b5b5b5; --pad-btn: #e2e2e2; --pad-btn-ink: #262626; --pad-shoulder: #4a4a4a;
   --shadow: 0 8px 28px rgba(0, 0, 0, .45);
@@ -111,7 +111,7 @@ main { max-width: 1120px; margin: 0 auto; padding: 24px 24px 24px; }
 .modes .tab .start { width: 12px; height: 12px; stroke-width: 1.75; opacity: .7; }
 .modes-wrap { display: flex; align-items: center; gap: 4px; min-width: 0; }
 .modes { position: relative; isolation: isolate; display: flex; border: 1.5px solid var(--line); background: var(--surface); overflow-x: auto; scrollbar-width: none; }
-.modes .thumb { position: absolute; z-index: 1; top: 0; bottom: 0; left: 0; width: 0; background: var(--mode); transition: transform 280ms var(--ease), width 280ms var(--ease), background-color 280ms var(--ease); }
+.modes .thumb { position: absolute; z-index: 1; top: 0; bottom: 0; left: 0; width: 100%; background: var(--mode); clip-path: inset(0 100% 0 0); transition: clip-path 280ms var(--ease), background-color 280ms var(--ease); }
 .modes .tab > * { position: relative; z-index: 2; }
 .modes .tab:focus-visible { z-index: 3; outline-color: currentColor; outline-offset: -5px; }
 .modes .tab { position: relative; border: 0; background: transparent; height: 34px; padding: 0 16px; gap: 8px; font-weight: 500; transition: color 280ms var(--ease), background var(--fast) var(--ease); }
@@ -135,8 +135,9 @@ main { max-width: 1120px; margin: 0 auto; padding: 24px 24px 24px; }
 .pad svg { display: block; width: 100%; height: 100%; overflow: visible; }
 .leaders { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; overflow: visible; transition: opacity var(--fast) var(--ease); }
 .leaders.moving { opacity: 0; transition-duration: 60ms; }
-.leaders polyline { fill: none; stroke: var(--leader); stroke-width: 1; transition: stroke var(--fast) var(--ease); }
-.leaders polyline.sel { stroke: var(--mode); stroke-width: 1.75; }
+.leaders polyline { fill: none; stroke: var(--leader); stroke-width: 1.5; transition: stroke var(--fast) var(--ease); }
+.leaders polyline.sel { stroke: var(--mode); stroke-width: 2.25; }
+.stage .col { position: relative; z-index: 3; }
 
 /* controller drawing */
 .pad .body { fill: var(--pad-body); stroke: var(--pad-stroke); stroke-width: 2; }
@@ -299,7 +300,8 @@ dialog textarea { width: 100%; height: 260px; padding: 10px; font: 12px/1.5 var(
 .seg .thumb { position: absolute; top: 0; bottom: 0; left: 0; background: var(--ink); transition: transform var(--move) var(--ease); }
 .seg button { position: relative; border: 0; background: transparent; height: 32px; width: 44px; padding: 0; }
 .seg button[aria-checked="true"] { color: var(--bg); }
-.seg.text button { width: auto; padding: 0 14px; }
+.seg.text button { width: 96px; padding: 0 12px; }
+dialog:focus { outline: none; }
 .seg .thumb { width: 0; }
 .pop .opt .sub { margin-left: 8px; font-weight: 400; font-size: 12px; color: var(--muted); }
 .phone-note { display: flex; align-items: flex-start; gap: 10px; padding: 10px 8px 10px 16px; background: var(--mode-tint); border-bottom: 1.5px solid var(--mode); font-size: 13px; }

@@ -187,7 +187,7 @@ function drawLeaders() {
   for (const slot of $$('.slot[data-side]')) {
     const n = slot.dataset.button, b = pad.buttons[n], r = slot.getBoundingClientRect(), left = slot.dataset.side === 'left';
     const pts = [...(plan.via[n] || []), [b.x, b.y]].map(p => through(rel, p));
-    const x1 = (left ? r.right : r.left) - st.left, y1 = r.top + r.height / 2 - st.top;
+    const x1 = (left ? r.right - 2 : r.left + 2) - st.left, y1 = r.top + r.height / 2 - st.top;
     let line = g.querySelector(`[data-for="${n}"]`);
     if (!line) { line = document.createElementNS(NS, 'polyline'); line.dataset.for = n; g.append(line); }
     line.setAttribute('points', [[x1, y1], [kneeX(x1, pts[0][0]), y1], ...pts].map(p => p.join(',')).join(' '));
@@ -348,12 +348,13 @@ function fillModes() {
   tabs.forEach((t, i) => { t.setAttribute('aria-selected', String(i === mode)); t.tabIndex = i === mode ? 0 : -1; });
   const cur = tabs[mode], thumb = $('#modes .thumb'), wrap = $('#modes');
   if (cur) {
-    const w = wrap.getBoundingClientRect(), r = cur.getBoundingClientRect(), sep = tabs[mode + 1] ? parseFloat(getComputedStyle(tabs[mode + 1]).borderLeftWidth) : 0;
-    // clientLeft rounds a 1.5px border to 1px, which left a sliver on Retina screens, so use the exact width
-    const x0 = w.left + parseFloat(getComputedStyle(wrap).borderLeftWidth) - wrap.scrollLeft;
-    const left = mode === 0 ? 0 : r.left - x0, right = r.right - x0 + sep;
-    thumb.style.width = right - left + 'px';
-    thumb.style.transform = `translateX(${left}px)`;
+    // The fill spans the whole strip and is clipped to the selected tab, so at the
+    // first and last tab it meets the frame exactly instead of by a rounded width.
+    thumb.style.width = wrap.scrollWidth > wrap.clientWidth + 1 ? wrap.scrollWidth + 'px' : '100%';
+    const t = thumb.getBoundingClientRect(), r = cur.getBoundingClientRect();
+    const sep = tabs[mode + 1] ? parseFloat(getComputedStyle(tabs[mode + 1]).borderLeftWidth) : 0;
+    const L = mode === 0 ? 0 : r.left - t.left, R = mode === tabs.length - 1 ? 0 : Math.max(0, t.right - r.right - sep);
+    thumb.style.clipPath = `inset(0 ${R}px 0 ${L}px)`;
   }
 
 }
@@ -715,7 +716,7 @@ function modal(title, html) {
   capturing = recording = false; hideTip(); closePop();
   $('#modal-title').textContent = title; $('#modal-body').innerHTML = html;
   $$('#modal-body [data-ic]').forEach(b => b.prepend(icon(b.dataset.ic)));
-  $('#modal').showModal();
+  $('#modal').showModal(); $('#modal').focus();
 }
 $('#close-modal').onclick = () => $('#modal').close();
 $('#modal').addEventListener('click', e => { if (e.target === $('#modal')) $('#modal').close(); });
@@ -747,9 +748,9 @@ $('#options').onclick = () => {
       <div class="seg" role="radiogroup" aria-label="Theme" id="theme-seg"><span class="thumb"></span>
         <button role="radio" data-v="system" data-ic="system" data-tip="Match system" aria-label="Match system"></button><button role="radio" data-v="light" data-ic="sun" data-tip="Light" aria-label="Light"></button><button role="radio" data-v="dark" data-ic="moon" data-tip="Dark" aria-label="Dark"></button></div></div>
     <div class="opt-section"><h3>Show the mode on screen</h3>
-      <p class="note">When a button switches modes, Karabiner shows the new mode's name</p>
+      <p class="note">When a button switches modes, Karabiner can show the mode's name in the corner of the screen</p>
       <div class="seg text" role="radiogroup" aria-label="Show the mode on screen" id="notify-seg"><span class="thumb"></span>
-        <button role="radio" data-v="brief">For a moment</button><button role="radio" data-v="always">Until the next switch</button><button role="radio" data-v="off">Off</button></div></div>
+        <button role="radio" data-v="brief" data-tip="Shows the new mode for about a second">Briefly</button><button role="radio" data-v="always" data-tip="Keeps the current mode on screen">Always</button><button role="radio" data-v="off">Off</button></div></div>
     <div class="opt-section"><h3>Device</h3>
       <p class="note">Exported rules only apply to this ${pad.name}. Find its IDs in Karabiner-EventViewer under Devices</p>
       <div class="ids"><label>Vendor ID<input id="vendor" type="number" min="0" max="65535"></label><label>Product ID<input id="product" type="number" min="0" max="65535"></label></div></div>
