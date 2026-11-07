@@ -291,6 +291,10 @@ dialog a { color: inherit; }
 dialog textarea { width: 100%; height: 260px; padding: 10px; font: 12px/1.5 var(--mono); background: var(--bg); color: var(--ink); border: 1.5px solid var(--rule); resize: vertical; }
 .opt-section { padding: 16px 0; border-bottom: 1px solid var(--rule); display: flex; flex-direction: column; gap: 10px; }
 .opt-section:last-child { border-bottom: 0; padding-bottom: 0; }
+.opt-section.links { flex-direction: row; gap: 4px; }
+a.icon { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; color: var(--ink); border: 1.5px solid transparent; transition: background var(--fast) var(--ease), border-color var(--fast) var(--ease); }
+a.icon:active { transform: scale(0.97); }
+@media (hover: hover) { a.icon:hover { border-color: var(--rule); background: var(--surface); } }
 .opt-section h3 { margin: 0; font-size: 14px; }
 .ids { display: flex; gap: 12px; flex-wrap: wrap; }
 .ids label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); }
@@ -301,7 +305,7 @@ dialog textarea { width: 100%; height: 260px; padding: 10px; font: 12px/1.5 var(
 .seg button { position: relative; border: 0; background: transparent; height: 32px; width: 44px; padding: 0; }
 .seg button[aria-checked="true"] { color: var(--bg); }
 .seg.text button { width: 96px; padding: 0 12px; }
-dialog:focus { outline: none; }
+dialog:focus, dialog:focus-visible { outline: none; }
 .seg .thumb { width: 0; }
 .pop .opt .sub { margin-left: 8px; font-weight: 400; font-size: 12px; color: var(--muted); }
 .phone-note { display: flex; align-items: flex-start; gap: 10px; padding: 10px 8px 10px 16px; background: var(--mode-tint); border-bottom: 1.5px solid var(--mode); font-size: 13px; }

@@ -694,6 +694,9 @@ $$('#pad [data-button]').forEach(g => {
 const tip = $('#tip');
 let tipTimer, warmUntil = 0;
 function showTip(target) {
+  // An open dialog sits in the top layer, so a tip for something inside it must live inside it too.
+  const host = target.closest('dialog[open]') || document.body;
+  if (tip.parentNode !== host) host.append(tip);
   tip.replaceChildren(target.dataset.tip);
   if (target.dataset.keys) { const k = target.dataset.keys.split(' '); tip.append(keyCaps({key_code: k.pop(), modifiers: k})); }
   tip.hidden = false;
@@ -742,6 +745,14 @@ $('#guide').onclick = () => modal('How it works', `<ol class="guide">
     <p class="note">You can also Download the file, put it in <code>~/.config/karabiner/assets/complex_modifications/</code> and use Add predefined rule.</p></li>
 </ol>`);
 
+// The row of links at the bottom of Options: who made it, the code, docs, feedback.
+const LINKS = [
+  ['user', 'https://github.com/ethanuser', 'Made by Ethan Nguyen'],
+  ['code', 'https://github.com/ethanuser/padmap', 'Source code on GitHub'],
+  ['book', 'https://karabiner-elements.pqrs.org/docs/json/', 'Karabiner JSON reference'],
+  ['message', 'https://forms.gle/bjfMxpALeZdQ8KvK8', 'Suggest improvements'],
+  ['coffee', 'https://buymeacoffee.com/ethannguyen', 'Buy me a coffee'],
+];
 $('#options').onclick = () => {
   modal('Options', `
     <div class="opt-section"><h3>Appearance</h3>
@@ -757,7 +768,7 @@ $('#options').onclick = () => {
     <div class="opt-section"><h3>Mappings</h3>
       <p class="note">Saved in this browser only</p>
       <div class="dialog-actions"><button id="import-btn" data-ic="upload">Import JSON</button><button id="reset-btn" class="danger" data-ic="reset">Reset to example</button></div></div>
-    <div class="opt-section"><p class="note"><a href="https://karabiner-elements.pqrs.org/docs/json/" target="_blank" rel="noreferrer">Karabiner JSON reference</a></p></div>`);
+    <div class="opt-section links">${LINKS.map(([ic, href, tip]) => `<a class="icon" href="${href}" target="_blank" rel="noopener" data-ic="${ic}" data-tip="${tip}" aria-label="${tip}"></a>`).join('')}</div>`);
   segmented($('#theme-seg'), () => store.get(THEME) || 'system', v => { store.set(THEME, v); applyTheme(); });
   segmented($('#notify-seg'), () => state.notify || 'off', v => { state.notify = v; save(); });
   $('#vendor').value = state.vendor; $('#product').value = state.product;
