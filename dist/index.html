@@ -1,7 +1,94 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Map your 8BitDo remote by feel. See every press, customize shortcuts, and export Karabiner rules."><title>Clickshift — Make every press yours</title><link rel="stylesheet" href="style.css"></head><body>
-<header><a class="brand" href="./"><span class="brand-icon">⌘</span>clickshift<span class="beta">BETA</span></a><nav><button id="guide">How it works ↗</button><button id="import">↥ Import JSON</button><button id="export" class="primary">Export configuration <span>↗</span></button></nav></header>
-<main><div class="intro"><div><div class="eyebrow">A LITTLE REMOTE. A LOT OF POSSIBILITY.</div><h1>Make every press yours<span>.</span></h1><p>Your 8BitDo, your shortcuts. Press a button. Give it a new purpose.</p></div><div class="local"><i></i> Saved in this browser</div></div>
-<div class="workspace"><section class="visual panel"><div class="panel-heading"><div><span class="eyebrow">YOUR CONTROLLER</span><h2>8BitDo <span>Zero 2 style</span></h2></div><span class="pill">KEYBOARD MODE</span></div><div class="controller-stage"><div class="orb"></div><div class="remote"><button class="shoulder left" data-button="L">L</button><button class="shoulder right" data-button="R">R</button><div class="remote-logo">8BitDo<span>ZERO 2</span></div><div class="dpad"><button data-button="Up" class="up" aria-label="D-pad up">▲</button><button data-button="Left" class="left" aria-label="D-pad left">◀</button><div class="center"></div><button data-button="Right" class="right" aria-label="D-pad right">▶</button><button data-button="Down" class="down" aria-label="D-pad down">▼</button></div><div class="face-buttons"><button data-button="X" class="x">X</button><button data-button="Y" class="y">Y</button><button data-button="A" class="a">A</button><button data-button="B" class="b">B</button></div><div class="small-buttons"><label><button data-button="Select" aria-label="Select"></button>SELECT</label><label><button data-button="Start" aria-label="Start"></button>START</label></div><div class="led"></div></div><div class="stage-caption"><span>↑</span> Click a button to start mapping</div></div><div class="listen-bar"><div><span id="listen-dot" class="status-dot"></span><strong id="listen-status">Input listening paused</strong><small id="input-status">Connect your remote in keyboard mode</small></div><button id="listen">Start listening</button></div><div class="signal"><div><span class="eyebrow">LAST INPUT</span><strong id="last-input">—</strong></div><span class="signal-arrow">⟶</span><div><span class="eyebrow">MAPPED OUTPUT</span><strong id="last-output">Waiting for a press</strong></div><span id="signal-mode" class="pill">ANKI</span></div><p class="hint">Keyboard inputs work too. Disable existing Karabiner rules while calibrating so Clickshift receives the original keys.</p></section>
-<section class="editor panel"><div class="panel-heading"><div><span class="eyebrow">MAKE IT YOURS</span><h2>Button mapping</h2></div><span class="step">01 / 02</span></div><div class="mode-tabs"><button data-mode="1" class="active">▣ Anki</button><button data-mode="0">▷ Video</button></div><div class="selection"><span id="selected-badge">A</span><div><h3 id="selected-title">A button</h3><p id="selected-sub">Customize what this button does.</p></div></div><label class="field-label">INPUT KEY <span>From your remote</span></label><div class="capture-row"><code id="input-key">j</code><button id="capture">◎ Capture input</button></div><div id="capture-help" class="help">Starting layout is a suggestion. Capture each button to match your remote.</div><label for="action" class="field-label">OUTPUT ACTION</label><select id="action"></select><div id="custom-fields"><label class="field-label" for="custom-key">KEY CODE</label><input id="custom-key" placeholder="e.g. spacebar"><div class="modifiers"><label><input type="checkbox" value="left_command"> ⌘ Cmd</label><label><input type="checkbox" value="left_shift"> ⇧ Shift</label><label><input type="checkbox" value="left_option"> ⌥ Opt</label><label><input type="checkbox" value="left_control"> ⌃ Ctrl</label></div></div><div class="mapping-preview"><span id="preview-from">A</span><span>⟶</span><strong id="preview-to">Good</strong><kbd id="preview-key">3</kbd></div><p class="editor-note">Changes save automatically. Your Anki and Video mappings stay separate.</p><div class="toggle-note"><span>⇄</span><p><strong>Two modes. One remote.</strong><br>Start switches between Video and Anki in your exported configuration. Video is the initial mode.</p></div></section></div>
-<section class="map-section"><div class="section-title"><div><h2>Your layout <span id="map-count"></span></h2><p>A shortcut for every button. Select one to fine-tune it.</p></div><button id="reset">↺ Reset to example</button></div><div id="mapping-grid"></div></section><footer><span><b>clickshift</b> &nbsp; Small buttons. Big possibilities.</span><span>Built for 8BitDo · Exported for Karabiner</span></footer></main>
-<dialog id="modal"><div class="dialog-heading"><h2 id="modal-title"></h2><button id="close-modal" aria-label="Close dialog">✕</button></div><div id="modal-body"></div></dialog><input type="file" id="file" accept=".json,application/json" hidden><div id="toast" role="status"></div><script type="module" src="app.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Remap a controller in keyboard mode and generate Karabiner-Elements JSON.">
+<title>Pad Map</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="phone-note" id="phone-note" role="note" hidden>
+  <span class="ic"></span>
+  <p><strong>Pad Map is made for desktop.</strong> Open it on the Mac your remote is paired with. You can still look around here.</p>
+  <button id="phone-close" class="icon" aria-label="Dismiss"></button>
+</div>
+<header>
+  <a class="brand" href="./">Pad Map</a>
+  <span class="tagline">Turn controller buttons into Karabiner rules</span>
+  <nav>
+    <div class="history">
+      <button id="undo" class="icon" data-tip="Undo" data-keys="left_command z" aria-label="Undo" disabled></button>
+      <button id="redo" class="icon" data-tip="Redo" data-keys="left_shift left_command z" aria-label="Redo" disabled></button>
+    </div>
+    <button id="guide" class="icon" data-tip="How it works" aria-label="How it works"></button>
+    <button id="options" class="icon" data-tip="Options" aria-label="Options"></button>
+    <button id="export" class="primary"><span class="ic"></span>Export<span class="wide"> JSON</span></button>
+  </nav>
+</header>
+
+<main>
+  <div class="bar">
+    <div class="modes-wrap">
+      <div class="modes" id="modes" role="tablist" aria-label="Modes">
+        <span class="thumb" aria-hidden="true"></span>
+      </div>
+      <button id="edit-mode" class="icon" data-tip="Edit this mode" aria-label="Edit this mode"></button>
+      <button id="add-mode" class="icon" data-tip="Add a mode" aria-label="Add a mode"></button>
+    </div>
+    <div class="rotates">
+      <button id="rotate-ccw" class="icon" data-tip="Rotate left" aria-label="Rotate controller left"></button>
+      <button id="rotate-cw" class="icon" data-tip="Rotate right" aria-label="Rotate controller right"></button>
+    </div>
+  </div>
+
+  <section class="stage" id="stage" aria-label="Controller buttons">
+    <div class="col left" id="col-left"></div>
+    <div class="pad" id="pad"></div>
+    <div class="col right" id="col-right"></div>
+    <svg class="leaders" id="leaders" aria-hidden="true"></svg>
+  </section>
+  <div class="extras" id="extras" hidden></div>
+
+  <section class="editor" aria-labelledby="ed-name">
+    <div class="ed-head">
+      <span id="ed-glyph"></span>
+      <h2 id="ed-name">A button</h2>
+    </div>
+    <div class="ed-grid">
+      <div class="ed-label"><span class="ic" data-icon="remote"></span>Remote sends</div>
+      <div class="ed-value"><kbd class="cap" id="input-key">G</kbd></div>
+      <button id="capture" class="side" data-tip="Press this button on your remote to update its key" data-icon="remote"><span class="ic"></span><span class="lbl">Re-capture</span></button>
+
+      <div class="ed-label" id="picker-label"><span class="ic" data-icon="mac"></span>Mac gets in <span class="mode-chip" id="ed-mode">Anki</span></div>
+      <button id="picker-btn" class="picker-btn" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="picker-label picker-value">
+        <span class="pv" id="picker-value"></span><span class="chev"></span>
+      </button>
+      <button id="record" class="side" data-tip="Press any key combination to send it" data-icon="keyboard"><span class="ic"></span><span class="lbl">Record shortcut</span></button>
+    </div>
+  </section>
+</main>
+
+<div class="banner" id="banner" data-state="paused">
+  <div class="bn-inner">
+    <svg class="sig" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="4" width="3" height="10"/><rect x="6.5" y="2" width="3" height="12"/><rect x="11.5" y="6" width="3" height="8"/></svg>
+    <div class="bn-text" role="status" aria-live="polite"><strong id="bn-title">Not listening</strong><span id="bn-sub">Click the page to listen for your remote</span></div>
+    <div class="bn-last" id="bn-last"></div>
+  </div>
+</div>
+
+<div class="pop" id="pop" hidden></div>
+<dialog id="modal">
+  <div class="dialog-head">
+    <h2 id="modal-title"></h2>
+    <button id="close-modal" class="icon" data-tip="Close" aria-label="Close"></button>
+  </div>
+  <div id="modal-body"></div>
+</dialog>
+<div id="tip" role="tooltip" hidden></div>
+<input type="file" id="file" accept=".json,application/json" hidden>
+<div id="toast" role="status"></div>
+<script type="module" src="app.js"></script>
+</body>
+</html>
